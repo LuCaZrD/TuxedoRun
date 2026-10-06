@@ -9,7 +9,7 @@ struct Prefs: Codable {
     var showCountdown = true
 }
 
-final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUserNotificationCenterDelegate {
     let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     let meter = CPUMeter()
     let defaults = UserDefaults.standard
@@ -100,6 +100,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         loginItem.target = self
         menu.addItem(loginItem)
         menu.addItem(NSMenuItem(title: "Quit TuxedoRun", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        menu.delegate = self
         item.menu = menu
     }
 
@@ -138,6 +139,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         soundItem.state = prefs.sound ? .on : .off
         autoItem.state = c.autoStartBreaks ? .on : .off
         countdownItem.state = prefs.showCountdown ? .on : .off
+    }
+
+    /// Reading the login item state is slow-ish, so do it only when the menu opens.
+    func menuNeedsUpdate(_ menu: NSMenu) {
         loginItem.state = SMAppService.mainApp.status == .enabled ? .on : .off
     }
 
