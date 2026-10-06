@@ -1,6 +1,7 @@
 import Cocoa
 import ServiceManagement
 import UserNotifications
+import UniformTypeIdentifiers
 
 struct Prefs: Codable {
     var notifications = true
@@ -288,6 +289,43 @@ if let i = CommandLine.arguments.firstIndex(of: "--dump"), i + 1 < CommandLine.a
     sheet.unlockFocus()
     let rep = NSBitmapImageRep(data: sheet.tiffRepresentation!)!
     try! rep.representation(using: .png, properties: [:])!.write(to: URL(fileURLWithPath: CommandLine.arguments[i + 1]))
+    exit(0)
+}
+
+// `TuxedoRun --export dir` writes an animated GIF per stage, and one that tours them all, for the README.
+if let i = CommandLine.arguments.firstIndex(of: "--export"), i + 1 < CommandLine.arguments.count {
+    let dir = URL(fileURLWithPath: CommandLine.arguments[i + 1])
+    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    let scale: CGFloat = 8, pad: Int = 24
+    func gif(_ name: String, _ frames: [(NSImage, Double)]) {
+        let dest = CGImageDestinationCreateWithURL(dir.appendingPathComponent(name) as CFURL, UTType.gif.identifier as CFString, frames.count, nil)!
+        CGImageDestinationSetProperties(dest, [kCGImagePropertyGIFDictionary: [kCGImagePropertyGIFLoopCount: 0]] as CFDictionary)
+        for (img, delay) in frames {
+            let w = Int(img.size.width * scale) + pad * 2, h = Int(img.size.height * scale) + pad * 2
+            let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: w, pixelsHigh: h, bitsPerSample: 8, samplesPerPixel: 4,
+                                       hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+            NSGraphicsContext.saveGraphicsState()
+            let ctx = NSGraphicsContext(bitmapImageRep: rep)!
+            NSGraphicsContext.current = ctx
+            ctx.imageInterpolation = .none
+            hex(0x2b2f3a).setFill(); NSRect(x: 0, y: 0, width: w, height: h).fill()
+            img.draw(in: NSRect(x: CGFloat(pad), y: CGFloat(pad), width: img.size.width * scale, height: img.size.height * scale))
+            NSGraphicsContext.restoreGraphicsState()
+            CGImageDestinationAddImage(dest, rep.cgImage!, [kCGImagePropertyGIFDictionary: [kCGImagePropertyGIFDelayTime: delay]] as CFDictionary)
+        }
+        CGImageDestinationFinalize(dest)
+    }
+    let sleep = sleepFrames.map { ($0, 0.6) }
+    let wave = waveFrames.map { ($0, 0.14) }
+    let run = runFrames.map { ($0, 0.07) }
+    let rest = breakFrames.map { ($0, 0.6) }
+    let cheer = cheerFrames.map { ($0, 0.12) }
+    gif("sleeping.gif", sleep + sleep)
+    gif("waving.gif", wave + wave)
+    gif("running.gif", Array(repeating: run, count: 6).flatMap { $0 })
+    gif("break.gif", rest + rest)
+    gif("cheer.gif", cheer + cheer)
+    gif("hero.gif", sleep + sleep + wave + wave + Array(repeating: run, count: 5).flatMap { $0 } + cheer + rest + rest)
     exit(0)
 }
 
