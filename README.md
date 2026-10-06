@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="docs/icon.png" width="128" alt="TuxedoRun app icon">
+</p>
+
+<p align="center">
   <img src="docs/hero.gif" width="320" alt="A pixel tuxedo cat that sleeps, waves its ears, runs, rests, and cheers">
 </p>
 
@@ -83,10 +87,10 @@ CPU.swift        the CPU meter
 Pomodoro.swift   the timer state machine (Foundation only)
 Selftest.swift   --selftest: checks the timer without a UI
 main.swift       the menu bar app, menu, notifications, and animation loop
-build.sh         builds and signs TuxedoRun.app
+build.sh         builds TuxedoRun.app, draws its icon, and signs it
 ```
 
-Two more flags help when you change the art: `--dump out.png` writes every frame to one sheet, and `--export docs` regenerates the GIFs in this README.
+Three more flags help when you change the art: `--dump out.png` writes every frame to one sheet, `--export docs` regenerates the GIFs in this README, and `--icon dir` writes the app icon. The icon is drawn from the avatar at build time, so a new pet gets a matching icon automatically.
 
 ## Don't like cats? Make your own avatar
 

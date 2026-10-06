@@ -9,6 +9,7 @@ TuxedoRun is a macOS menu bar app: a pixel pet whose animation follows CPU load,
 TuxedoRun.app/Contents/MacOS/TuxedoRun --selftest    # check the pomodoro logic; exits 0 or 1
 TuxedoRun.app/Contents/MacOS/TuxedoRun --dump out.png    # render every frame to one PNG sheet
 TuxedoRun.app/Contents/MacOS/TuxedoRun --export docs     # regenerate the README GIFs
+TuxedoRun.app/Contents/MacOS/TuxedoRun --icon dir        # write the app icon (an .iconset) from the avatar; build.sh does this for you
 TuxedoRun.app/Contents/MacOS/TuxedoRun --fast            # run the app with 10 s focus / 4 s breaks, nothing saved
 ```
 
@@ -50,7 +51,8 @@ Users can swap the cat for any pet they like. All the work is in `Avatar.swift`.
 6. **Rim.** `rimColor` is the light outline drawn around the pet so a dark pet still shows on a dark menu bar. Keep it light, or lower its alpha for a light-colored pet.
 7. **Check it.** Run `./build.sh`, then `--dump sheet.png` and open the PNG. Look at all frames: sleeping (Z's), waving, running (speed lines), resting (heart), and cheering (sparkles). Fix anything that looks broken or cropped.
 8. **Install.** Quit the running copy (`pkill -x TuxedoRun`), copy `TuxedoRun.app` to `/Applications`, and open it.
-9. **Optional:** run `--export docs` to regenerate the README GIFs, and update the avatar mentions in `README.md`.
+9. **Icon:** `./build.sh` redraws the app icon from the new sprite. Check `--icon /tmp/icon` and open `icon_512x512@2x.png` if you changed the sprite size, to make sure the pet fits the tile.
+10. **Optional:** run `--export docs` to regenerate the README GIFs, copy a fresh `docs/icon.png`, and update the avatar mentions in `README.md`.
 
 Constraints worth knowing:
 

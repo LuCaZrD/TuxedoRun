@@ -10,6 +10,10 @@ app="$work/TuxedoRun.app"
 mkdir -p "$app/Contents/MacOS"
 swiftc -O -o "$app/Contents/MacOS/TuxedoRun" *.swift
 cp Info.plist "$app/Contents/Info.plist"
+# The app icon is drawn from the avatar, so a new pet gets a matching icon.
+mkdir -p "$app/Contents/Resources"
+"$app/Contents/MacOS/TuxedoRun" --icon "$work/AppIcon.iconset"
+iconutil -c icns "$work/AppIcon.iconset" -o "$app/Contents/Resources/AppIcon.icns"
 codesign --force --sign - "$app"
 rm -rf TuxedoRun.app
 ditto --noextattr --noqtn "$app" TuxedoRun.app

@@ -4,6 +4,7 @@
 <key>CFBundleName</key><string>TuxedoRun</string>
 <key>CFBundleDisplayName</key><string>TuxedoRun</string>
 <key>CFBundleIdentifier</key><string>local.tuxedorun</string>
+<key>CFBundleIconFile</key><string>AppIcon</string>
 <key>CFBundleExecutable</key><string>TuxedoRun</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>1.0</string>

@@ -329,6 +329,74 @@ if let i = CommandLine.arguments.firstIndex(of: "--export"), i + 1 < CommandLine
     exit(0)
 }
 
+// `TuxedoRun --icon dir` writes AppIcon.iconset (the app icon at every size) from the avatar. build.sh turns it into AppIcon.icns.
+if let i = CommandLine.arguments.firstIndex(of: "--icon"), i + 1 < CommandLine.arguments.count {
+    let dir = URL(fileURLWithPath: CommandLine.arguments[i + 1])
+    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+
+    // Master at 1024: a rounded tile with the pet on it, one sprite pixel is a whole number of icon pixels.
+    let master = 1024
+    let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: master, pixelsHigh: master, bitsPerSample: 8, samplesPerPixel: 4,
+                               hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+    NSGraphicsContext.saveGraphicsState()
+    let ctx = NSGraphicsContext(bitmapImageRep: rep)!
+    NSGraphicsContext.current = ctx
+    let tile = NSRect(x: 100, y: 100, width: 824, height: 824)
+    let shape = NSBezierPath(roundedRect: tile, xRadius: 185, yRadius: 185)
+    NSGraphicsContext.saveGraphicsState()
+    let drop = NSShadow()
+    drop.shadowColor = NSColor.black.withAlphaComponent(0.3); drop.shadowBlurRadius = 24; drop.shadowOffset = NSSize(width: 0, height: -10)
+    drop.set()
+    hex(0x4a86e8).setFill(); shape.fill()
+    NSGraphicsContext.restoreGraphicsState()
+    NSGradient(starting: hex(0x8fc1ff), ending: hex(0x3f6fd8))!.draw(in: shape, angle: -90)
+
+    let p = CGFloat(master) * 0.62 / CGFloat(max(spriteW, spriteH * 4 / 3)) // the pet fills about 62% of the tile
+    let pw = CGFloat(spriteW) * p.rounded(.down), ph = CGFloat(spriteH) * p.rounded(.down)
+    let unit = p.rounded(.down)
+    let ox = (CGFloat(master) - pw) / 2, oy = (CGFloat(master) - ph) / 2 - 10
+    ctx.shouldAntialias = false
+    // A soft shadow under the pet, drawn once so the pixels stay crisp.
+    NSGraphicsContext.saveGraphicsState()
+    ctx.shouldAntialias = true
+    let under = NSShadow()
+    under.shadowColor = NSColor.black.withAlphaComponent(0.3); under.shadowBlurRadius = 28; under.shadowOffset = NSSize(width: 0, height: -14)
+    under.set()
+    NSColor.black.setFill()
+    let silhouette = NSBezierPath()
+    for (y, row) in sprite.enumerated() { for (x, ch) in row.enumerated() where palette[ch] != nil {
+        silhouette.append(NSBezierPath(rect: NSRect(x: ox + CGFloat(x) * unit, y: oy + CGFloat(spriteH - 1 - y) * unit, width: unit, height: unit)))
+    } }
+    silhouette.fill() // covered by the sprite pixels below, so only the shadow shows
+    NSGraphicsContext.restoreGraphicsState()
+    ctx.shouldAntialias = false
+    for (y, row) in sprite.enumerated() { for (x, ch) in row.enumerated() where palette[ch] != nil {
+        palette[ch]!.setFill()
+        NSRect(x: ox + CGFloat(x) * unit, y: oy + CGFloat(spriteH - 1 - y) * unit, width: unit, height: unit).fill()
+    } }
+    for (ex, ey) in eyes {
+        eyeColor.setFill()
+        NSRect(x: ox + CGFloat(ex) * unit, y: oy + CGFloat(spriteH - 1 - ey - 1) * unit, width: unit * 2, height: unit * 2).fill()
+    }
+    NSGraphicsContext.restoreGraphicsState()
+    let masterImage = NSImage(size: NSSize(width: master, height: master))
+    masterImage.addRepresentation(rep)
+
+    for (name, px) in [("16x16", 16), ("16x16@2x", 32), ("32x32", 32), ("32x32@2x", 64), ("128x128", 128), ("128x128@2x", 256),
+                       ("256x256", 256), ("256x256@2x", 512), ("512x512", 512), ("512x512@2x", 1024)] {
+        let out = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: px, pixelsHigh: px, bitsPerSample: 8, samplesPerPixel: 4,
+                                   hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+        NSGraphicsContext.saveGraphicsState()
+        let c = NSGraphicsContext(bitmapImageRep: out)!
+        NSGraphicsContext.current = c
+        c.imageInterpolation = .high
+        masterImage.draw(in: NSRect(x: 0, y: 0, width: px, height: px))
+        NSGraphicsContext.restoreGraphicsState()
+        try! out.representation(using: .png, properties: [:])!.write(to: dir.appendingPathComponent("icon_\(name).png"))
+    }
+    exit(0)
+}
+
 let app = NSApplication.shared
 app.setActivationPolicy(.accessory)
 let delegate = AppDelegate()
