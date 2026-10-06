@@ -73,11 +73,12 @@ Building it yourself means macOS has no reason to warn you about the app. There 
 ## How it works
 
 - **CPU:** read from the Mach `host_processor_info` call once a second, averaged over every core, and smoothed.
-- **The cat:** a 16x12 pixel sprite drawn in code. Every frame (hop, ear flop, run lean, effects) is rendered from that one sprite, with a light rim so the dark fur reads on dark and light menu bars.
+- **The cat:** a 16x12 pixel sprite, defined in `Avatar.swift`. Every frame (hop, ear flop, run lean, effects) is rendered from that one sprite, with a light rim so the dark fur reads on dark and light menu bars.
 - **The timer:** a small state machine in `Pomodoro.swift` that uses only Foundation. It has its own checks you can run: `TuxedoRun --selftest` drives it through full cycles with a fake clock, including pause, skip, a long break, waking from a 10-hour sleep, a new day, and a relaunch.
 
 ```text
-Cat.swift        the sprite, poses, and every animation frame
+Avatar.swift     the pet's look: sprite, colors, eyes. Edit this to change the pet
+Cat.swift        draws every animation frame from the avatar
 CPU.swift        the CPU meter
 Pomodoro.swift   the timer state machine (Foundation only)
 Selftest.swift   --selftest: checks the timer without a UI
@@ -87,9 +88,17 @@ build.sh         builds and signs TuxedoRun.app
 
 Two more flags help when you change the art: `--dump out.png` writes every frame to one sheet, and `--export docs` regenerates the GIFs in this README.
 
-## Make it your own cat
+## Don't like cats? Make your own avatar
 
-The cat started as the `tuxedo` theme for [pixel-pet](https://github.com/Namenomeaning/pixel-pet), a pixel pet for the Claude Code terminal, and the theme is saved here as `tuxedo.theme.json`. To swap in a different pet, replace the `sprite` rows and `palette` colors at the top of `Cat.swift`, then rebuild.
+The cat is just one file. Everything that makes it look like a tuxedo cat lives in [`Avatar.swift`](Avatar.swift): the pixel rows, the colors, where the eyes sit. The animations (sleeping, waving, running, resting, cheering) are generated from it, so **any pet you draw gets all of them for free**.
+
+You can do it with an AI coding agent, such as Claude Code, Codex, or Cursor. The repo includes [`AGENTS.md`](AGENTS.md), a guide written for agents, so you can just describe what you want. Open the project in your agent and try:
+
+> Replace the avatar in TuxedoRun with a pixel **\<your pet\>**. Read `AGENTS.md`, edit only `Avatar.swift`, then build, run `--dump` to render all the frames, look at the PNG and fix any problems, and install the app to `/Applications`.
+
+Some ideas: a corgi, a ghost, a frog, a tiny robot, a slime, your own dog from a photo. A photo or a sketch works too: attach it and ask the agent to reduce it to a 16x12 pixel sprite.
+
+You can also edit `Avatar.swift` by hand. The sprite is plain text, one character per pixel.
 
 ## Credits
 

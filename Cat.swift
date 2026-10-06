@@ -1,42 +1,12 @@
 import Cocoa
 
-// MARK: - Sprite (the pixel-pet tuxedo cat, 16x12)
-
-let sprite = [
-    ".aa..........aa.",
-    "akia........aika",
-    "akkkaaaaaaaakkka",
-    "akkkkkkwwkkkkkka",
-    "akkkkkkwwkkkkkka",
-    "akkkkkwwwwkkkkka",
-    "asskwwwppwwwkssa",
-    "akkkwwwmmwwwkkka",
-    "asskwwwwwwwwkssa",
-    "akkkkwwwwwwkkkka",
-    "akkkkkwwwwkkkkka",
-    ".aaaaaaaaaaaaaa.",
-].map { Array($0) }
-
-func hex(_ v: UInt32, _ a: CGFloat = 1) -> NSColor {
-    NSColor(srgbRed: CGFloat((v >> 16) & 255) / 255, green: CGFloat((v >> 8) & 255) / 255,
-            blue: CGFloat(v & 255) / 255, alpha: a)
-}
-
-let palette: [Character: NSColor] = [
-    "a": hex(0x12121a), "k": hex(0x3a3a4c), "i": hex(0xc27a8f), "w": hex(0xf6f6f6),
-    "s": hex(0xb9bcc8), "p": hex(0xf58fa8), "m": hex(0xc27a8f),
-]
-let eyeColor = hex(0xc9e060)
-let rimColor = hex(0xe6e8f2, 0.9) // light rim so the dark cat reads on a dark menu bar
-let eyes = [(3, 4), (11, 4)]
-
 // MARK: - Frames
 
-let spriteW = 16, spriteH = 12
+let spriteW = sprite[0].count, spriteH = sprite.count
 let leftMargin = 3, rightMargin = 3 // room for speed streaks and sleeping z's
 let gridW = leftMargin + 1 + spriteW + 1 + rightMargin
 let gridH = spriteH + 2 // 1px rim around, 1px of hop headroom
-let px: CGFloat = 1.5
+let px: CGFloat = min(1.5, 21 / CGFloat(gridH)) // a taller sprite is shrunk to fit the menu bar
 
 struct Pose {
     var hop = 0
@@ -62,14 +32,14 @@ func render(_ pose: Pose) -> NSImage {
     for (y, row) in sprite.enumerated() {
         for (x, ch) in row.enumerated() {
             guard let c = palette[ch] else { continue }
-            let gx = x + ox + (y < 2 ? pose.ear : 0), gy = top + y
+            let gx = x + ox + (y < earRows ? pose.ear : 0), gy = top + y
             if gx >= 0, gx < gridW, gy >= 0, gy < gridH { grid[gy][gx] = c }
         }
     }
     for (ex, ey) in eyes {
         for dy in 0..<2 { for dx in 0..<2 {
             let gy = top + ey + dy, gx = ex + ox + dx
-            if pose.blink { grid[gy][gx] = dy == 1 ? palette["a"] : palette["k"] }
+            if pose.blink { grid[gy][gx] = dy == 1 ? closedEyeLine : closedEyeBody }
             else { grid[gy][gx] = eyeColor }
         } }
     }
