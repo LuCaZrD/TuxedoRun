@@ -94,3 +94,7 @@ The cat started as the `tuxedo` theme for [pixel-pet](https://github.com/Namenom
 ## Credits
 
 The tuxedo cat is original pixel art, drawn for pixel-pet and reused here. The idea owes a lot to [RunCat](https://kyome.io/runcat/), the menu bar app where a running animal shows your CPU.
+
+## License
+
+[MIT](LICENSE)
