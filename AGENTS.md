@@ -11,6 +11,7 @@ TuxedoRun.app/Contents/MacOS/TuxedoRun --dump out.png    # render every frame to
 TuxedoRun.app/Contents/MacOS/TuxedoRun --export docs     # regenerate the README GIFs
 TuxedoRun.app/Contents/MacOS/TuxedoRun --icon dir        # write the app icon (an .iconset) from the avatar; build.sh does this for you
 TuxedoRun.app/Contents/MacOS/TuxedoRun --fast            # run the app with 10 s focus / 4 s breaks, nothing saved
+TuxedoRun.app/Contents/MacOS/TuxedoRun --fast --autostart # same, and start a focus session on launch (for demos)
 ```
 
 There is no test framework. `--selftest` is the test suite, and `--dump` is how you check art without a menu bar.

@@ -54,6 +54,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, UNUser
             if let d = defaults.data(forKey: "prefs"), let p = try? JSONDecoder().decode(Prefs.self, from: d) { prefs = p }
             if let d = defaults.data(forKey: "state"), let s = try? JSONDecoder().decode(PomodoroSnapshot.self, from: d) { pomo.restore(s) }
         }
+        if CommandLine.arguments.contains("--autostart") { // for demos: start a focus session and auto-start breaks
+            var c = pomo.config
+            c.autoStartBreaks = true
+            pomo.config = c
+            pomo.start()
+        }
         pomo.onPhaseEnd = { [weak self] ended, next, nextRunning in self?.phaseEnded(ended, next, nextRunning) }
         UNUserNotificationCenter.current().delegate = self
 

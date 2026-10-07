@@ -19,6 +19,14 @@
   <img alt="Menu bar only" src="https://img.shields.io/badge/Dock-no%20icon-lightgrey">
 </p>
 
+## See it in action
+
+<p align="center">
+  <a href="docs/intro.mp4"><img src="docs/intro.gif" width="640" alt="TuxedoRun in the menu bar: the cat sleeps, waves its ears, and runs with CPU load, then runs a pomodoro timer"></a>
+</p>
+
+<p align="center"><sub>21 seconds, recorded from the real app. Click for the full-quality video.</sub></p>
+
 ## Why a cat?
 
 Your CPU load is boring to read as a number. A cat is not. Glance up and you know how hard your Mac is working: a sleeping cat means nothing is going on, and a sprinting cat means something is eating your cores. Then press Start and the same cat becomes your focus buddy.
@@ -72,7 +80,7 @@ Building it yourself means macOS has no reason to warn you about the app. There 
 /Applications/TuxedoRun.app/Contents/MacOS/TuxedoRun --fast
 ```
 
-`--fast` shrinks every phase to a few seconds (10 s of focus, 4 s of break) and saves nothing. Quit the normal copy first so you don't end up with two cats.
+`--fast` shrinks every phase to a few seconds (10 s of focus, 4 s of break) and saves nothing. Add `--autostart` to start a focus session on launch with breaks starting by themselves, which is how the video above was recorded. Quit the normal copy first so you don't end up with two cats.
 
 ## How it works
 
